@@ -1,4 +1,5 @@
 package me.qcarver.ballsack;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import processing.core.PApplet;
@@ -16,20 +17,33 @@ import processing.core.PApplet;
  * @author Quinn
  */
 public class Visualization extends PApplet{
-    
+ 
     class Circle{
-        public int startX, startY, endX, endY;
+        public float centerX, centerY, radius;
         public boolean makeCircle ;
+        Color c;
+        float transparency = OPAQUE; //255
         Circle(int startX, int startY){
-            this.startX = startX;
-            this.startY = startY;
+            this.centerX = startX;
+            this.centerY = startY;
             makeCircle = false;
+            c = new Color(random(1),random(1), random(1));
         }
-        public float getCircleSize(){
-            return (endX - startX + endY - startY) * 1.2f;
+        public void setSack(boolean isSack){
+            if (isSack){
+                transparency = 0;
+            }
         }
+
         public void draw(){
-            ellipse(startX, startY, getCircleSize(), getCircleSize());
+            fill(c.getRGB(),transparency);
+            ellipse(centerX, centerY, radius, radius);
+        }
+
+        public void update(float targetX, float targetY,float radius){
+            centerX = targetX;
+            centerY = targetY;
+            this.radius = radius;
         }
     };
     
@@ -41,6 +55,9 @@ public class Visualization extends PApplet{
     public void setup() {
         size(500,400);
         background(grayValue);
+        noFill();
+        ellipseMode(RADIUS);
+        
     }
 
     public void draw() {
@@ -66,8 +83,9 @@ public class Visualization extends PApplet{
     
     public void mouseDragged(){
         currentCircle.makeCircle = true;
-        currentCircle.endX = mouseX;
-        currentCircle.endY = mouseY;
+        currentCircle.radius =
+                dist(currentCircle.centerX, currentCircle.centerY,mouseX, mouseY);
+       
     }
     
     public void mouseReleased(){
@@ -77,6 +95,9 @@ public class Visualization extends PApplet{
             if(circles == null){
                 circles = new ArrayList<Circle>();
             }
+            //check and process for containing circles
+            condense();
+            
             //archive the currentCircle
             circles.add(currentCircle);
   
@@ -84,5 +105,53 @@ public class Visualization extends PApplet{
             currentCircle.makeCircle = false;
             currentCircle = null; 
         }
+    }
+    
+    //if there are circles with this circle condense them all together
+    public void condense(){
+        List<Circle> containedCircles = null;
+        float newCenterX = 0, newCenterY = 0;
+        for (Circle circle : circles){
+            if (contains(currentCircle, circle)){
+                if (containedCircles == null){
+                    containedCircles = new ArrayList<Circle>();
+                }
+                newCenterX += circle.centerX;
+                newCenterY += circle.centerY;
+                containedCircles.add(circle);
+            }
+        }
+        
+        if (containedCircles != null){
+            cluster (newCenterX/containedCircles.size(),
+                    newCenterY/containedCircles.size(),
+                    containedCircles);
+        }
+    }
+
+    
+    //cluster circles around a point .. and make the current circle bag them
+    public void cluster(float x, float y, List<Circle> circles){
+        float maxRadius = 0;
+        //for each contained circle
+        for (Circle circle : circles){
+            //get the angle x,y to circle center
+            float theta = atan2(y - circle.centerY, x - circle.centerX);
+            //find the new circle mid-point which is radius away from the x,y
+            float rho = circle.radius;
+            //update the circle
+            float targetX = (rho*-1) * cos(theta) + x;
+            float targetY = (rho*-1) * sin(theta) + y;
+            circle.update(targetX,targetY,rho);
+            //update the maxRadius of the containing circle
+            maxRadius = (maxRadius < rho)? rho * 2 + 10 : maxRadius;
+        }
+        currentCircle.update(x,y,maxRadius);
+        currentCircle.setSack(true);
+    }
+    
+    public boolean contains(Circle container, Circle containee){
+        return (dist(container.centerX, container.centerY,
+                containee.centerX, containee.centerY)<=container.radius);
     }
 }
