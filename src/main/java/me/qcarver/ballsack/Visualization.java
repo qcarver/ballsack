@@ -41,6 +41,10 @@ public class Visualization extends PApplet{
                 transparency = 0;
             }
         }
+        
+        public float area(){
+            return (float)Math.PI * radius * radius;
+        }
 
         public void draw(){
             fill(c.getRGB(),transparency);
@@ -147,32 +151,33 @@ public class Visualization extends PApplet{
     }
 
     
-    //cluster circles around a point .. and make the current circle bag them
+    //cluster circles .. and make the current circle bag them
     public void cluster(float x, float y, List<Circle> circles){
         float maxRadius = 0;
-        Circle bigGuy = null;
+        //Pick the biggest circle as the middle of the cluster
+        Circle biggest = null;
         //for each contained circle .. (remember sorted by size decending)
         for (Circle circle : circles){
-            float rho = circle.radius;
-            if (bigGuy == null){
+            if (biggest == null){
                 circle.centerX = x;
                 circle.centerY = y;
-                bigGuy = circle;
+                biggest = circle;
             }
             else //the big guys' posse
             {
-                //get the angle x,y to circle center
+                //get the angle from center of biggest circle to this one
                 float theta = atan2(y - circle.centerY, x - circle.centerX);
-                //find the new circle mid-point which is radius away from the x,y
-                
-                //update the circle
-                float targetX = (rho - bigGuy.radius *-1) * cos(theta) + x;
-                float targetY = (rho - bigGuy.radius *-1) * sin(theta) + y;
-                circle.update(targetX,targetY,rho);
+                //find the distance from center of biggest circle to this one
+                float rho = biggest.radius + circle.radius;
+                //update the circle to it's new location
+                float targetX = (rho * -1) * cos(theta) + x;
+                float targetY = (rho * -1) * sin(theta) + y;
+                circle.update(targetX,targetY,circle.radius);
+                //update the maxRadius of the containing circle
+                maxRadius = (maxRadius < biggest.radius + circle.diameter() + 2)? 
+                    biggest.radius + circle.diameter() + 2 : maxRadius;
             }
-            //update the maxRadius of the containing circle
-            maxRadius = (maxRadius < bigGuy.radius + circle.diameter() + 2)? 
-                    bigGuy.radius + circle.diameter() + 2 : maxRadius;
+            
         }
         currentCircle.update(x,y,maxRadius);
         currentCircle.setSack(true);
