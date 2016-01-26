@@ -154,16 +154,19 @@ public class Visualization extends PApplet{
     //cluster circles .. and make the current circle bag them
     public void cluster(float x, float y, List<Circle> circles){
         float maxRadius = 0;
+        float avX = 0, avY = 0, sumRadius = 0;
         //Pick the biggest circle as the middle of the cluster
         Circle biggest = null;
         //for each contained circle .. (remember sorted by size decending)
         for (Circle circle : circles){
+            //hueristic: things pack neater if we put big guy in middle
             if (biggest == null){
                 circle.centerX = x;
                 circle.centerY = y;
+                maxRadius = circle.radius + 2;
                 biggest = circle;
             }
-            else //the big guys' posse
+            else //the rest of the posse
             {
                 //get the angle from center of biggest circle to this one
                 float theta = atan2(y - circle.centerY, x - circle.centerX);
@@ -175,11 +178,15 @@ public class Visualization extends PApplet{
                 circle.update(targetX,targetY,circle.radius);
                 //update the maxRadius of the containing circle
                 maxRadius = (maxRadius < biggest.radius + circle.diameter() + 2)? 
-                    biggest.radius + circle.diameter() + 2 : maxRadius;
-            }
-            
+                    biggest.radius + circle.diameter() + 2 : maxRadius;               
+            }            
+            //building up new data to guestimate new mid point of the cluster
+            sumRadius +=circle.radius;
+            avX += circle.centerX * circle.radius;
+            avY += circle.centerY * circle.radius;            
         }
-        currentCircle.update(x,y,maxRadius);
+        //current circle becomes the containing sack for Circles
+        currentCircle.update(avX/sumRadius,avY/sumRadius,maxRadius);
         currentCircle.setSack(true);
     }
     
