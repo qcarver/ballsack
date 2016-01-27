@@ -25,6 +25,8 @@ public class Visualization extends PApplet{
         public boolean makeCircle ;
         Color c;
         float transparency = OPAQUE; //255
+        private List<Circle> circles;
+        
         Circle(int startX, int startY){
             this.centerX = startX;
             this.centerY = startY;
@@ -36,10 +38,12 @@ public class Visualization extends PApplet{
             return 2*radius;
         }
         
-        public void setSack(boolean isSack){
-            if (isSack){
-                transparency = 0;
-            }
+        public void makeSack(List<Circle> circlesInSack){
+            //in the GUI we represent the sack by being transparent
+            transparency = 0;
+            //these are the circles this sack is in charge of
+            circles = new ArrayList<Circle>();
+            circles = circlesInSack;
         }
         
         public float area(){
@@ -49,12 +53,31 @@ public class Visualization extends PApplet{
         public void draw(){
             fill(c.getRGB(),transparency);
             ellipse(centerX, centerY, radius, radius);
+            
+            if (circles != null){
+            for (Circle circle : circles){
+                circle.draw();
+            }
+            }
+        }
+        
+        public void update(float targetX, float targetY,float radius){  
+           this.radius = radius; 
+           update(targetX, targetY);
         }
 
-        public void update(float targetX, float targetY,float radius){
+        public void update(float targetX, float targetY){           
+            if (circles != null){
+                float deltaX = targetX - centerX;
+                float deltaY = targetY - centerY;
+                for (Circle circle : circles){
+                    //circle.centerX += deltaX;
+                    //circle.centerY += deltaY;
+                    circle.update(circle.centerX + deltaX, circle.centerY + deltaY);
+                }
+            }
             centerX = targetX;
-            centerY = targetY;
-            this.radius = radius;
+            centerY = targetY;        
         }
     };
     
@@ -161,8 +184,7 @@ public class Visualization extends PApplet{
         for (Circle circle : circles){
             //hueristic: things pack neater if we put big guy in middle
             if (biggest == null){
-                circle.centerX = x;
-                circle.centerY = y;
+                circle.update(x,y);
                 maxRadius = circle.radius + 2;
                 biggest = circle;
             }
@@ -175,7 +197,7 @@ public class Visualization extends PApplet{
                 //update the circle to it's new location
                 float targetX = (rho * -1) * cos(theta) + x;
                 float targetY = (rho * -1) * sin(theta) + y;
-                circle.update(targetX,targetY,circle.radius);
+                circle.update(targetX,targetY);
                 //update the maxRadius of the containing circle
                 maxRadius = (maxRadius < biggest.radius + circle.diameter() + 2)? 
                     biggest.radius + circle.diameter() + 2 : maxRadius;               
@@ -187,7 +209,10 @@ public class Visualization extends PApplet{
         }
         //current circle becomes the containing sack for Circles
         currentCircle.update(avX/sumRadius,avY/sumRadius,maxRadius);
-        currentCircle.setSack(true);
+        currentCircle.makeSack(circles);
+        
+        //the sacked circles are no longer managed by this object
+        this.circles.removeAll(circles);
     }
     
     public boolean contains(Circle container, Circle containee){
