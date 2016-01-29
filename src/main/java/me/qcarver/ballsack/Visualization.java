@@ -47,7 +47,6 @@ public class Visualization extends PApplet {
         if ((currentCircle != null) && (currentCircle.makeCircle)) {
             //draw the circle we are currently dragging out
             currentCircle.draw();
-
         }
     }
 
@@ -101,8 +100,7 @@ public class Visualization extends PApplet {
             Sack sack = new Sack(currentCircle, containedCircles);
             circles.removeAll(containedCircles);
             circles.add(sack);
-        }
-        
+        }        
         return (containedCircles != null);
     }
 

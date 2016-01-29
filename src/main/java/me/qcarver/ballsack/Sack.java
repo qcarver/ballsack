@@ -31,7 +31,8 @@ public class Sack extends Circle {
         //these are the circles this sack is in charge of
         circles = new TreeSet<Circle>(new DescendingRadius());
         circles.addAll(circlesInSack);
-        cluster();
+        clusterContents();
+        adjustRadiusAndCenterToContents();
     }
 
     public void draw() {
@@ -58,20 +59,14 @@ public class Sack extends Circle {
     }
     
     //cluster circles inside this sack
-    public void cluster() {
-        float maxRadius = 0;
-        //used to guesimate the new center of the cluster
-        float avX = 0, avY = 0, sumRadius = 0;
-        //Pick the biggest circle as the middle of the cluster
+    public void clusterContents() {
+        //Pick the biggest circle as the middle of the clusteContents
         Circle biggest = null;
-        //Pick the next biggest circle to help us figure sack radius
-        Circle veep = null;
         //for each contained circle .. (remember sorted by size decending)
         for (Circle circle : circles) {
             //hueristic: things pack neater if we put big guy in middle
             if (biggest == null) {
                 circle.update(centerX, centerY);
-                maxRadius = circle.radius + 2;
                 biggest = circle;
             } else //the rest of the posse
             {
@@ -83,17 +78,29 @@ public class Sack extends Circle {
                 float targetX = (rho * -1) * cos(theta) + centerX;
                 float targetY = (rho * -1) * sin(theta) + centerY;
                 circle.update(targetX, targetY);
-                //update our (the sack's) radius --HACK assumes posse only is one ring thick!
-                if (veep == null){
-                    maxRadius = biggest.radius + circle.diameter() + 2;
-                    veep = circle;
-                }
             }
-            //building up new data to guestimate new mid point of the cluster
-            sumRadius += circle.radius;
-            avX += circle.centerX * circle.radius;
-            avY += circle.centerY * circle.radius;
         }
-        update(avX/sumRadius,avY/sumRadius,maxRadius);
+    }
+    
+    private void adjustRadiusAndCenterToContents(){
+        float maxDist = circles.first().diameter();
+        float weightedXSum = 0, weightedYSum = 0, sumRadius = 0;
+        //O(ln(n^2)) loop of circles compared to unique circles
+        for (Circle circleA : circles){
+            for (Circle circleB : circles){
+                //symetric matrix only want to measure unique circles once
+                if (circleA == circleB) break;
+                //tally info needed to determine radius size
+                float distAB = P.dist(  circleA.centerX,circleA.centerY,
+                                        circleB.centerX, circleB.centerY);
+                distAB += (circleA.radius + circleB.radius);
+                maxDist = (maxDist > distAB)? maxDist : distAB;
+                //tally info needed to determine center point (center of mass)
+            }
+            sumRadius += circleA.radius;
+            weightedXSum += circleA.centerX * circleA.radius;
+            weightedYSum += circleA.centerY * circleA.radius;
+        }
+        update(weightedXSum/sumRadius,weightedYSum/sumRadius,maxDist/2 + 2);
     }
 }
