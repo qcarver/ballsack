@@ -16,7 +16,11 @@ import static processing.core.PApplet.sin;
  * @author Quinn
  */
 public class Sack extends Circle {
+    //refrences to all the circles in the sack
     private TreeSet<Circle> circles;
+    
+    //reference to the biggest circle in the sack
+    private Circle biggest = null;
 
     private Sack(float centerX, float centerY) {
         super(centerX, centerY);
@@ -61,7 +65,7 @@ public class Sack extends Circle {
     //cluster circles inside this sack
     public void clusterContents() {
         //Pick the biggest circle as the middle of the clusteContents
-        Circle biggest = null;
+        biggest = null;
         //for each contained circle .. (remember sorted by size decending)
         for (Circle circle : circles) {
             //hueristic: things pack neater if we put big guy in middle
@@ -71,15 +75,58 @@ public class Sack extends Circle {
             } else //the rest of the posse
             {
                 //get the angle from center of biggest circle to this one
-                float theta = atan2(centerY - circle.centerY, centerX - circle.centerX);
+                float theta = angleToCircleFromCenter(circle);
                 //find the distance from center of biggest circle to this one
-                float rho = biggest.radius + circle.radius;
+                float rho = distanceFromCircleToCenter(circle);
                 //update the circle to its new location (-1 dunno why but works)
                 float targetX = (rho * -1) * cos(theta) + centerX;
                 float targetY = (rho * -1) * sin(theta) + centerY;
                 circle.update(targetX, targetY);
             }
         }
+    }
+    
+    /**
+     * returns (rho) the angle from the middle of the biggest circle to a circle
+     * @param circle the satelite circle of the biggest circle, passed in.
+     * @return the angle in radians from the biggest circles center
+     */
+    public float angleToCircleFromCenter(Circle circle){
+        return atan2(biggest.centerY - circle.centerY, 
+                biggest.centerX - circle.centerX);
+    }
+    
+    /**
+     * returns (theta) distance from the middles of the big circle and another
+     * @param circle
+     * @return 
+     */
+    private float distanceFromCircleToCenter(Circle circle){
+        return biggest.radius + circle.radius;
+    }
+    
+    /**
+     * Gets angle from big circles middle to a circle's counter clockwise edge
+     * @param circle the circle to measure to the edge of
+     * @return the angle from the center of the biggest circle to the ccw edge
+     */
+    private float ccwEclipsingAngle(Circle circle){
+        return angleToCircleFromCenter(circle) - 
+                (2f*(float)(Math.PI) - 
+                (float)(Math.PI)/2f - 
+                angleToCircleFromCenter(circle));       
+    }
+    
+    /**
+     * Gets angle from big circles middle to a circle's counter clockwise edge
+     * @param circle the circle to measure to the edge of
+     * @return the angle from the center of the biggest circle to the ccw edge
+     */    
+    private float cwEclipsingAngle(Circle circle){
+        return angleToCircleFromCenter(circle) + 
+                (2f*(float)(Math.PI) - 
+                (float)(Math.PI)/2f - 
+                angleToCircleFromCenter(circle));        
     }
     
     private void adjustRadiusAndCenterToContents(){
