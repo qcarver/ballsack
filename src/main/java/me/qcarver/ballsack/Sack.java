@@ -5,6 +5,7 @@
  */
 package me.qcarver.ballsack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 import static processing.core.PApplet.atan2;
@@ -17,11 +18,17 @@ import static processing.core.PApplet.sin;
  */
 public class Sack extends Circle {
     //refrences to all the circles in the sack
-    private TreeSet<Circle> circles;
+    private List<Circle> circles = null;
+    
+    //references to the circles in order of descending radius size
+    private TreeSet<Circle> descendingRadius = null;
+    
+    //references to the circles in order of distance from the center
+    private TreeSet<Circle> ascendingDistance = null;
     
     //reference to the biggest circle in the sack
     private Circle biggest = null;
-
+    
     private Sack(float centerX, float centerY) {
         super(centerX, centerY);
     }
@@ -32,13 +39,24 @@ public class Sack extends Circle {
         radius = circle.radius;
         //in the GUI we represent the sack by being transparent
         transparency = 0;
-        //these are the circles this sack is in charge of
-        circles = new TreeSet<Circle>(new DescendingRadius());
+        //init a bunch of npe'able member vars now
+        circles = new ArrayList<Circle>();
         circles.addAll(circlesInSack);
+        //circles sorted Biggest to Smallest
+        descendingRadius = new TreeSet<Circle>(new DescendingRadius());
+        descendingRadius.addAll(circles);
+        //self explanatory
+        biggest = descendingRadius.first();
+        biggest.update(centerX, centerY);
+        //all other circles sorted by distance from center circle.. 
+        ascendingDistance = new TreeSet<Circle>(new DistanceToCenterCircle(biggest));
+        ascendingDistance.addAll(circles);
+        ascendingDistance.remove(biggest);
+        //get the circles organized
         clusterContents();
         adjustRadiusAndCenterToContents();
     }
-
+  
     public void draw() {
         super.draw();
 
@@ -64,28 +82,19 @@ public class Sack extends Circle {
     
     //cluster circles inside this sack
     public void clusterContents() {
-        //Pick the biggest circle as the middle of the clusteContents
-        biggest = null;
-        //for each contained circle .. (remember sorted by size decending)
-        for (Circle circle : circles) {
-            //hueristic: things pack neater if we put big guy in middle
-            if (biggest == null) {
-                circle.update(centerX, centerY);
-                biggest = circle;
-            } else //the rest of the posse
-            {
-                //get the angle from center of biggest circle to this one
-                float theta = angleToCircleFromCenter(circle);
-                //find the distance from center of biggest circle to this one
-                float rho = distanceFromCircleToCenter(circle);
-                //update the circle to its new location (-1 dunno why but works)
-                float targetX = (rho * -1) * cos(theta) + centerX;
-                float targetY = (rho * -1) * sin(theta) + centerY;
-                circle.update(targetX, targetY);
-            }
+        //for each contained circle from closest to center out
+        for (Circle circle : ascendingDistance) {
+            //get the angle from center of biggest circle to this one
+            float theta = angleToCircleFromCenter(circle);
+            //find the distance from center of biggest circle to this one
+            float rho = distanceFromCircleToCenter(circle);
+            //update the circle to its new location (-1 dunno why but works)
+            float targetX = (rho * -1) * cos(theta) + centerX;
+            float targetY = (rho * -1) * sin(theta) + centerY;
+            circle.update(targetX, targetY);
         }
     }
-    
+        
     /**
      * returns (rho) the angle from the middle of the biggest circle to a circle
      * @param circle the satelite circle of the biggest circle, passed in.
@@ -130,7 +139,7 @@ public class Sack extends Circle {
     }
     
     private void adjustRadiusAndCenterToContents(){
-        float maxDist = circles.first().diameter();
+        float maxDist = biggest.diameter();
         float weightedXSum = 0, weightedYSum = 0, sumRadius = 0;
         //O(ln(n^2)) loop of circles compared to unique circles
         for (Circle circleA : circles){
