@@ -12,7 +12,8 @@ import java.util.Comparator;
  *
  * @author Quinn
  */
-public class Radians{
+public class Radians implements Comparable{
+    float pi = (float)(Math.PI);
     private float value;
     public Radians(float value){
         this.value = value;
@@ -21,7 +22,23 @@ public class Radians{
     public float value(){
         return value;
     }
+    
+    /**
+     * Returns the absolute angle in radians opposite of the member value
+     * @return the angle opposite of the member value
+     */
+    private float oppositeAngle(){
+        float oppositeAngle = value - pi;
+        //Adj for case where 0/2Pi is between value and opposite angle
+        if (oppositeAngle < 0f){
+            oppositeAngle = 2*pi - oppositeAngle;
+        }
+        return oppositeAngle;
+    }
+    
 
+
+    
     //TODO isCcwOf... isCwOf
     
         //if ccwTanLineAngleToCenter is ccw of plantedCircles cw tangent
@@ -41,4 +58,21 @@ public class Radians{
                 //if both flags and two colliding circles
                     //circle will rest on top of colliding circles 
                     //(you have known side lenths of the triangle)
+
+    @Override
+    public int compareTo(Object o) {
+        Radians other = (Radians)o;
+        float adj = 0;
+        //if the comparison will cross the origin (0/2Pi)
+        if (oppositeAngle() > pi){
+            adj = 2*pi;
+        }
+        return (int)((this.value + 2*pi)*1000 - (other.value)*1000);         
+    }
+
+
+    
+    
+
+
 }
