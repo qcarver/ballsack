@@ -13,10 +13,17 @@ import java.util.Comparator;
  * @author Quinn
  */
 public class Radians implements Comparable{
-    float pi = (float)(Math.PI);
-    private float value;
+    private final static float pi = (float)(Math.PI);
+    private final float value;
+    
+    //Though Math.PI is a double, processing will cast down to a float anyway
+    public Radians(double value){
+        this((float)value);
+    }
+    
     public Radians(float value){
-        this.value = value;
+        //internally we only to deal with the range 0...2Pi
+        this.value = (value < 0)? (value % (2 * pi)) + 2*pi : value % (2*pi); 
     }
     
     public float value(){
@@ -36,9 +43,7 @@ public class Radians implements Comparable{
         return oppositeAngle;
     }
     
-
-
-    
+ 
     //TODO isCcwOf... isCwOf
     
         //if ccwTanLineAngleToCenter is ccw of plantedCircles cw tangent
@@ -60,14 +65,31 @@ public class Radians implements Comparable{
                     //(you have known side lenths of the triangle)
 
     @Override
+    /**
+     * Think of a negative result as being ccw to, positive cw to
+     */
     public int compareTo(Object o) {
-        Radians other = (Radians)o;
-        float adj = 0;
-        //if the comparison will cross the origin (0/2Pi)
-        if (oppositeAngle() > pi){
-            adj = 2*pi;
-        }
-        return (int)((this.value + 2*pi)*1000 - (other.value)*1000);         
+        return compareTo(((Radians)o).value());     
+    }
+    
+    public int compareTo(double otherAngle){
+        return compareTo((float)otherAngle);
+    }
+    
+    public int compareTo(float otherAngle){     
+        //(cpu_facing-player_degree+360)%360>180
+        return (int) ((otherAngle-value+2f*pi)%2*pi-pi);
+//        float adj = 0;
+//        float ourAdjustedAngle = value;
+//        //if the comparison will cross the origin (0/2Pi)
+//        if ((otherAngle > pi) && (value < pi)){
+//            adj = 2*pi - otherAngle;
+//            if (adj + value < pi){
+//            otherAngle += adj;
+//            ourAdjustedAngle += adj;
+//            }
+//        }
+//        return (int)((otherAngle)*1000 - (ourAdjustedAngle)*1000);      
     }
 
 
