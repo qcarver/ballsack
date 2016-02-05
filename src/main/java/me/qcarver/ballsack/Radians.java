@@ -76,22 +76,36 @@ public class Radians implements Comparable{
         return compareTo((float)otherAngle);
     }
     
-    public int compareTo(float otherAngle){     
-        //(cpu_facing-player_degree+360)%360>180
-        return (int) ((otherAngle-value+2f*pi)%2*pi-pi);
-//        float adj = 0;
-//        float ourAdjustedAngle = value;
-//        //if the comparison will cross the origin (0/2Pi)
-//        if ((otherAngle > pi) && (value < pi)){
-//            adj = 2*pi - otherAngle;
-//            if (adj + value < pi){
-//            otherAngle += adj;
-//            ourAdjustedAngle += adj;
-//            }
-//        }
-//        return (int)((otherAngle)*1000 - (ourAdjustedAngle)*1000);      
+    public int compareTo(float otherAngle){  
+        //initialize to pi incase we default to 180 degrees
+        float difference = pi;
+        if ((value < pi) && (otherAngle < pi) ||
+            (value > pi) && (otherAngle > pi)){
+            difference = value - otherAngle;
+        }
+        else {
+            float bigAngle = otherAngle;
+            float lilAngle = value;
+            float sign = 1;
+            if (value > otherAngle)
+                bigAngle = value;
+                lilAngle = otherAngle;
+                sign = -1;
+                float adj = (2*pi - bigAngle);
+                difference = sign * (lilAngle + adj);
+        }
+        return (int)difference*1000;
     }
-
+    //One must be true
+/* case 1: There is a <180 angle that is completely within the first Pi
+        Test if both angles are less than Pi return the one minus the other
+ case 2: There is a <180 angle that spans both Pi
+    Test that one Angle is between Pi and 2Pi and the other is < Pi
+    Result: 
+    case 3: There is a <180 angle that is completely within the second Pi
+        Test if both angles are less than Pi 
+        Restult return the one minus the other    
+    */
 
     
     

@@ -7,11 +7,8 @@ package me.qcarver.ballsack;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import static org.junit.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  *
@@ -32,26 +29,12 @@ public class RadiansTest {
         radians.add(new Radians(1.1 * pi));
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
+    
 
     /**
      * Test of value method, of class Radians.
      */
-    @org.junit.Test
+    @Test
     public void testValue() {
         System.out.println("value");
         Radians instance = new Radians(2 * pi);
@@ -63,7 +46,7 @@ public class RadiansTest {
     /**
      * Test of compareTo method, of class Radians.
      */
-    @org.junit.Test
+    @Test
     public void testCompareTo_Object() {
         boolean first = true;
         System.out.print("Radians values unsorted: ");
