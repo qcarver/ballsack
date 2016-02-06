@@ -5,8 +5,6 @@
  */
 package me.qcarver.ballsack;
 
-import java.util.Comparator;
-
 
 /**
  *
@@ -29,19 +27,7 @@ public class Radians implements Comparable{
     public float value(){
         return value;
     }
-    
-    /**
-     * Returns the absolute angle in radians opposite of the member value
-     * @return the angle opposite of the member value
-     */
-    private float oppositeAngle(){
-        float oppositeAngle = value - pi;
-        //Adj for case where 0/2Pi is between value and opposite angle
-        if (oppositeAngle < 0f){
-            oppositeAngle = 2*pi - oppositeAngle;
-        }
-        return oppositeAngle;
-    }
+
     
  
     //TODO isCcwOf... isCwOf
@@ -65,19 +51,48 @@ public class Radians implements Comparable{
                     //(you have known side lenths of the triangle)
 
     @Override
-    /**
-     * Think of a negative result as being ccw to, positive cw to
+    /** 
+    * method for comparing angles (delta in radians * 1000)
+     * @param other
+     * @return value in radians * 1000 where negative is counterclockwise
      */
-    public int compareTo(Object o) {
-        return compareTo(((Radians)o).value());     
+    public int compareTo(Object other) {
+        return compareTo(((Radians)other).value());     
     }
     
+     /**
+     * method for comparing angles (delta in radians * 1000)
+     * @param otherAngle
+     * @return value in radians * 1000 where negative is counterclockwise
+     */
     public int compareTo(double otherAngle){
         return compareTo((float)otherAngle);
     }
-    
+ 
+    /**
+     * method for comparing angles (delta in radians * 1000)
+     * @param otherAngle
+     * @return value in radians * 1000 where negative is counterclockwise
+     */
     public int compareTo(float otherAngle){  
-        //initialize to pi incase we default to 180 degrees
+        return (int)(delta(otherAngle)*1000);
+    }
+    
+     /**
+     * Finds the size of the angle rotating from this angle to another
+     * @param other
+     * @return value in radians where negative is counterclockwise
+     */
+    public float delta(Radians other){
+        return delta(other.value());
+    }
+    
+     /**
+     * Finds the size of the angle rotating from this angle to another
+     * @param otherAngle
+     * @return value in radians where negative is counterclockwise
+     */
+    public float delta(float otherAngle){  
         float difference = pi;
         if ((value < pi) && (otherAngle < pi) ||
             (value > pi) && (otherAngle > pi)){
@@ -87,25 +102,21 @@ public class Radians implements Comparable{
             float bigAngle = otherAngle;
             float lilAngle = value;
             float sign = 1;
-            if (value > otherAngle)
+            if (value > otherAngle){
                 bigAngle = value;
                 lilAngle = otherAngle;
                 sign = -1;
-                float adj = (2*pi - bigAngle);
+            }
+            if ((bigAngle - lilAngle) < pi){
+                difference = sign * (bigAngle - lilAngle);
+            } else {
+                float adj = (2f*pi - bigAngle);
                 difference = sign * (lilAngle + adj);
+            }
         }
-        return (int)difference*1000;
+        return difference;
     }
-    //One must be true
-/* case 1: There is a <180 angle that is completely within the first Pi
-        Test if both angles are less than Pi return the one minus the other
- case 2: There is a <180 angle that spans both Pi
-    Test that one Angle is between Pi and 2Pi and the other is < Pi
-    Result: 
-    case 3: There is a <180 angle that is completely within the second Pi
-        Test if both angles are less than Pi 
-        Restult return the one minus the other    
-    */
+
 
     
     
