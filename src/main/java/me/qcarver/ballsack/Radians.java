@@ -94,10 +94,12 @@ public class Radians implements Comparable{
      */
     public float delta(float otherAngle){  
         float difference = pi;
+        //these are simple cases where the angle can't span the origin
         if ((value < pi) && (otherAngle < pi) ||
             (value > pi) && (otherAngle > pi)){
             difference = value - otherAngle;
         }
+        //this is the case where the angle could span the origin
         else {
             float bigAngle = otherAngle;
             float lilAngle = value;
@@ -107,9 +109,11 @@ public class Radians implements Comparable{
                 lilAngle = otherAngle;
                 sign = -1;
             }
+            //the shortest route doesn't span the origin
             if ((bigAngle - lilAngle) < pi){
                 difference = sign * (bigAngle - lilAngle);
             } else {
+                //the shortest route DOES span the origin
                 float adj = (2f*pi - bigAngle);
                 difference = sign * (lilAngle + adj);
             }
