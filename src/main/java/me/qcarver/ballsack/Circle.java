@@ -15,13 +15,23 @@ import processing.core.PApplet;
  *
  * @author Quinn
  */
-class Circle {
+public class Circle {
         float transparency = OPAQUE; //255
         public float centerX, centerY, radius;
         public boolean makeCircle;
+        public String name;
         Color c;
 
         protected static PApplet P = null;
+        
+        /**
+         * Constructor for non-UI construction
+         * @param name 
+         */
+        Circle(String name){
+            this(0,0);
+            this.name = name;      
+        }
 
         Circle(float centerX, float centerY) {
             this.centerX = centerX;

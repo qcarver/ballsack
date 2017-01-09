@@ -1,10 +1,7 @@
 package me.qcarver.ballsack;
 
-import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
 import processing.core.PApplet;
 
 /*
@@ -22,6 +19,7 @@ public class Visualization extends PApplet {
 
     List<Circle> circles;
 
+    @Override
     public void setup() {
         //need to pass the Processing context to apps that use it
         Circle.setPApplet(this);
@@ -87,6 +85,7 @@ public class Visualization extends PApplet {
                 if (containedCircles == null) {
                     containedCircles = new ArrayList<Circle>();
                 }
+                //keep summations of x and y positions to use in average later
                 newCenterX += circle.centerX;
                 newCenterY += circle.centerY;
                 containedCircles.add(circle);
@@ -95,6 +94,7 @@ public class Visualization extends PApplet {
 
         if (containedCircles != null) {
             currentCircle.update(
+                    //change the new circles position to be the average
                     newCenterX / containedCircles.size(),
                     newCenterY / containedCircles.size());
             Sack sack = new Sack(currentCircle, containedCircles);
