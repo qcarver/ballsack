@@ -39,6 +39,7 @@ public class XmlVisualization extends DefaultHandler {
     SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd");
     Stack<PlaceHolder> ancestry = new Stack<>();
     Set<Circle> sackMe = new HashSet<>();
+    Circle rootElement = null;
 
     /**
      * Until we close an element, we don't know if it's a circle or a sack keep
@@ -75,6 +76,10 @@ public class XmlVisualization extends DefaultHandler {
             System.out.println("IO error");
         }
     }
+    
+    public Circle getCircle(){
+        return rootElement;
+    }
 
     @Override
     public void startElement(String s, String s1, String elementName, Attributes attributes) throws SAXException {
@@ -101,17 +106,21 @@ public class XmlVisualization extends DefaultHandler {
         //we are closing a leaf node... this is represented by a circle
         if (elementStarted) {
             //make a new circle with the last childs name and size
-            ancestry.peek().instance = new Circle(ancestry.peek().name);
+            ancestry.peek().instance = new Circle(ancestry.peek().name,
+                this.tmpValue.length());
             newElement = ancestry.pop().instance;
+            tmpValue = "";
             //TODO: Change to log line
             System.out.print(newElement.name+" ");
         } else {
             //we are closing an internal node ... represented by a sack
             newElement = ancestry.pop().instance;
-            //((Sack) newElement).closeSack();
+            ((Sack) newElement).closeSack();
+            //when the stack is done this will be the root element
+            rootElement = newElement;
         }
         //If this is not the close of the root anscestor..
-        if (ancestry.size() > 1) {
+        if (ancestry.size() > 0) {
             //so preceeding instance must be an internal node ...(a sack)
             if (ancestry.peek().instance == null) {
                 //first sibling to go in this sack, must make the sack first
@@ -127,7 +136,7 @@ public class XmlVisualization extends DefaultHandler {
 
     @Override
     public void characters(char[] ac, int i, int j) throws SAXException {
-        tmpValue = new String(ac, i, j);
+        tmpValue += new String(ac, i, j);
     }
 
     public static void main(String[] args) {

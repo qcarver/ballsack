@@ -8,6 +8,7 @@ package me.qcarver.ballsack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+import javax.security.auth.login.Configuration;
 import net.sourceforge.circlepack.utils.ComputePositions;
 import static processing.core.PApplet.atan2;
 import static processing.core.PApplet.cos;
@@ -49,9 +50,11 @@ public class Sack extends Circle {
     }
 
     public void closeSack() {
-        //TODO: lots! figure out size and position of circles in sack
-        //      figure out size and position of sack itself
-        assert (false);
+        //djustRadiusAndCenterToContents();
+
+        placeCircles();
+        
+        this.update( 250,250);
     }
 
     public Sack(Circle circle,
@@ -76,7 +79,7 @@ public class Sack extends Circle {
         //get the circles organized
         //clusterContents();
         adjustRadiusAndCenterToContents();
-        
+
         placeCircles();
 
     }

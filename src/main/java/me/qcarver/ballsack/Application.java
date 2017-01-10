@@ -10,8 +10,10 @@ package me.qcarver.ballsack;
  * @author Quinn
  */
 public class Application {
+    static String[] args;
 
     public static void main(String[] args) {
+        Application.args = args;
         new Application();
     }
 
@@ -21,6 +23,5 @@ public class Application {
 
     private void init() {
         Visualization.main("me.qcarver.ballsack.Visualization");
-
     }
 }

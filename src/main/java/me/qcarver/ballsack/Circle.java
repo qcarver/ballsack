@@ -32,6 +32,12 @@ public class Circle {
             this(0,0);
             this.name = name;      
         }
+        
+        Circle(String name, int radius){
+            this(0,0);
+            this.name = name;
+            this.radius = radius;
+        }
 
         Circle(float centerX, float centerY) {
             this.centerX = centerX;

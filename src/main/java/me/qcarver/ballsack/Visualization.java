@@ -25,15 +25,38 @@ public class Visualization extends PApplet {
         Circle.setPApplet(this);
         
         //Typical Processing setup stuff
-        size(500, 400);
+        size(1000, 800);
         background(grayValue);
         noFill();
         ellipseMode(RADIUS);
 
     }
+    
+    public void addCircle(Circle addMe){
+        //if this is the first time we have used our list.. allocate for it       
+            if (circles == null) {
+                circles = new ArrayList<Circle>();
+            }
+            circles.add(addMe);
+    }
+    
+    boolean runOnce = true;
 
     public void draw() {
         background(grayValue);
+        
+        if (runOnce){
+            XmlVisualization xmlViz =         
+                    new XmlVisualization(//"/Users/Quinn/Desktop/musicXml/cd_catalog.xml");
+                            //"/Users/Quinn/Desktop/simpleXml/Plants.xml");
+                            //"/Users/Quinn/Desktop/XmlTestData/NavigationStatusUpdate_ac110404-9777-89da-0000-00000001a3d7.xml");
+            "/Users/Quinn/Desktop/XmlTestData/AlertSourceList_ac110404-9777-89da-0000-000000006395.xml");
+            Circle docCircle = xmlViz.getCircle();
+            docCircle.update(width/2, height/2);
+            addCircle(docCircle);
+
+            runOnce = false;
+        }
 
         //draw previous circles
         if (circles != null) {
