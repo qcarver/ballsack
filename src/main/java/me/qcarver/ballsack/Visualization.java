@@ -1,8 +1,11 @@
 package me.qcarver.ballsack;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import processing.core.PApplet;
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -13,19 +16,25 @@ import processing.core.PApplet;
  *
  * @author Quinn
  */
-public class Visualization extends PApplet {
+public class Visualization extends PApplet implements ActionListener{
     int grayValue = 128;
     Circle currentCircle;
-
     List<Circle> circles;
 
+
+    void settings(){
+
+    }
+    
     @Override
     public void setup() {
+
+
         //need to pass the Processing context to apps that use it
         Circle.setPApplet(this);
         
         //Typical Processing setup stuff
-        size(1000, 800);
+        //size(widthPassedIn, heightPassedIn);
         background(grayValue);
         noFill();
         ellipseMode(RADIUS);
@@ -50,7 +59,7 @@ public class Visualization extends PApplet {
                     new XmlVisualization(//"/Users/Quinn/Desktop/musicXml/cd_catalog.xml");
                             //"/Users/Quinn/Desktop/simpleXml/Plants.xml");
                             //"/Users/Quinn/Desktop/XmlTestData/NavigationStatusUpdate_ac110404-9777-89da-0000-00000001a3d7.xml");
-            "/Users/Quinn/Desktop/XmlTestData/AlertSourceList_ac110404-9777-89da-0000-000000006395.xml");
+            "/Users/Quinn/Desktop/xml/XmlTestData/AlertSourceList_ac110404-9777-89da-0000-000000006395.xml");
             Circle docCircle = xmlViz.getCircle();
             docCircle.update(width/2, height/2);
             addCircle(docCircle);
@@ -130,5 +139,10 @@ public class Visualization extends PApplet {
     public boolean contains(Circle container, Circle containee) {
         return (dist(container.centerX, container.centerY,
                 containee.centerX, containee.centerY) <= container.radius);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
