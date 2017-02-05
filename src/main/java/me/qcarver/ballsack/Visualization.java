@@ -7,15 +7,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import processing.core.PApplet;
 
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
  *
- * @author Quinn
+ * @author Quinn  qcarver@gmail.com
  */
 public class Visualization extends PApplet implements ActionListener {
 
@@ -31,6 +25,7 @@ public class Visualization extends PApplet implements ActionListener {
     public void setup() {
         //need to pass the Processing context to apps that use it
         Circle.setPApplet(this);
+
         //Typical Processing setup stuff, but no sizing, our frame sets this
         background(grayValue);
         noFill();
@@ -60,6 +55,7 @@ public class Visualization extends PApplet implements ActionListener {
                 circle.draw();
             }
         }
+
         if ((currentCircle != null) && (currentCircle.makeCircle)) {
             //draw the circle we are currently dragging out
             currentCircle.draw();

@@ -26,14 +26,6 @@ public class Application extends JFrame implements DropTargetListener {
     static String[] args;
     Visualization applet = null;
 
-    public enum DragState {
-        Waiting,
-        Accept,
-        Reject
-    }
-    
-    private DragState state = DragState.Waiting;
-
     DropTarget dt = new DropTarget(
             this,
             DnDConstants.ACTION_COPY_OR_MOVE,
@@ -42,13 +34,10 @@ public class Application extends JFrame implements DropTargetListener {
 
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
-        state = DragState.Reject;
-        repaint();
     }
 
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
-        System.out.println("drag over");
     }
 
     @Override
@@ -57,18 +46,14 @@ public class Application extends JFrame implements DropTargetListener {
 
     @Override
     public void dragExit(DropTargetEvent dte) {
-        state = DragState.Waiting;
-        repaint();
     }
 
     @Override
     public void drop(DropTargetDropEvent dtde) {
-        state = DragState.Waiting;
         String filename = getFileNameDraggedEvent(dtde);
         if (!filename.isEmpty()){
             applet.dropXml(filename);
         }
-        repaint();
     }
 
     /**
