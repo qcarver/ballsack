@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import processing.core.PApplet;
 
 
@@ -16,64 +17,49 @@ import processing.core.PApplet;
  *
  * @author Quinn
  */
-public class Visualization extends PApplet implements ActionListener{
+public class Visualization extends PApplet implements ActionListener {
+
     int grayValue = 128;
     Circle currentCircle;
     List<Circle> circles;
 
-
-    void settings(){
+    void settings() {
 
     }
-    
+
     @Override
     public void setup() {
-
-
         //need to pass the Processing context to apps that use it
         Circle.setPApplet(this);
-        
-        //Typical Processing setup stuff
-        //size(widthPassedIn, heightPassedIn);
+        //Typical Processing setup stuff, but no sizing, our frame sets this
         background(grayValue);
         noFill();
         ellipseMode(RADIUS);
+    }
 
-    }
-    
-    public void addCircle(Circle addMe){
+    public void addCircle(Circle addMe) {
         //if this is the first time we have used our list.. allocate for it       
-            if (circles == null) {
-                circles = new ArrayList<Circle>();
-            }
-            circles.add(addMe);
+        if (circles == null) {
+            circles = new CopyOnWriteArrayList<Circle>();
+        }
+        circles.add(addMe);
     }
-    
-    boolean runOnce = true;
+
+    public void dropXml(String filename) {
+        XmlVisualization xmlViz = new XmlVisualization(filename);
+        Circle docCircle = xmlViz.getCircle();
+        docCircle.update(width / 2, height / 2);
+        addCircle(docCircle);
+    }
 
     public void draw() {
         background(grayValue);
-        
-        if (runOnce){
-            XmlVisualization xmlViz =         
-                    new XmlVisualization(//"/Users/Quinn/Desktop/musicXml/cd_catalog.xml");
-                            //"/Users/Quinn/Desktop/simpleXml/Plants.xml");
-                            //"/Users/Quinn/Desktop/XmlTestData/NavigationStatusUpdate_ac110404-9777-89da-0000-00000001a3d7.xml");
-            "/Users/Quinn/Desktop/xml/XmlTestData/AlertSourceList_ac110404-9777-89da-0000-000000006395.xml");
-            Circle docCircle = xmlViz.getCircle();
-            docCircle.update(width/2, height/2);
-            addCircle(docCircle);
 
-            runOnce = false;
-        }
-
-        //draw previous circles
         if (circles != null) {
             for (Circle circle : circles) {
                 circle.draw();
             }
         }
-
         if ((currentCircle != null) && (currentCircle.makeCircle)) {
             //draw the circle we are currently dragging out
             currentCircle.draw();
@@ -95,10 +81,10 @@ public class Visualization extends PApplet implements ActionListener{
         if (currentCircle.makeCircle == true) {
             //if this is the first time we have used our list.. allocate for it       
             if (circles == null) {
-                circles = new ArrayList<Circle>();
+                circles = new CopyOnWriteArrayList<Circle>();
             }
             //check and process for containing circles
-            if (condense() == false){
+            if (condense() == false) {
                 //archive the currentCircle
                 circles.add(currentCircle);
             }
@@ -109,7 +95,7 @@ public class Visualization extends PApplet implements ActionListener{
     }
 
     //if there are circles with this circle condense them all together
-    public boolean condense() {      
+    public boolean condense() {
         List<Circle> containedCircles = null;
         float newCenterX = 0, newCenterY = 0;
         for (Circle circle : circles) {
@@ -132,7 +118,7 @@ public class Visualization extends PApplet implements ActionListener{
             Sack sack = new Sack(currentCircle, containedCircles);
             circles.removeAll(containedCircles);
             circles.add(sack);
-        }        
+        }
         return (containedCircles != null);
     }
 

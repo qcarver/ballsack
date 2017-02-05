@@ -17,25 +17,21 @@ import java.io.IOException;
 import java.util.List;
 import javax.swing.JFrame;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
  *
- * @author Quinn
+ * @author Quinn qcarver@gmail.com
  */
 public class Application extends JFrame implements DropTargetListener {
 
     static String[] args;
+    Visualization applet = null;
 
     public enum DragState {
-
         Waiting,
         Accept,
         Reject
     }
+    
     private DragState state = DragState.Waiting;
 
     DropTarget dt = new DropTarget(
@@ -47,7 +43,6 @@ public class Application extends JFrame implements DropTargetListener {
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
         state = DragState.Reject;
-
         repaint();
     }
 
@@ -69,12 +64,15 @@ public class Application extends JFrame implements DropTargetListener {
     @Override
     public void drop(DropTargetDropEvent dtde) {
         state = DragState.Waiting;
-        getFileNameDraggedEvent(dtde);
+        String filename = getFileNameDraggedEvent(dtde);
+        if (!filename.isEmpty()){
+            applet.dropXml(filename);
+        }
         repaint();
     }
 
     /**
-     * Thanks to Rocket Hazmat on Stack Overflow for this gem. Behavior in
+     * Thanks to "Rocket Hazmat" on Stack Overflow for this gem. Behavior in
      * Windows different than Mac/Linux, so DnD impl is not straight fwd!
      *
      * @param dtde
@@ -105,7 +103,6 @@ public class Application extends JFrame implements DropTargetListener {
             // On Linux (and OS X) file DnD is a reader
             if (flavor.equals(Linux)) {
                 dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-
                 BufferedReader read = new BufferedReader(flavor.getReaderForText(tr));
                 // Remove 'file://' from file name
                 filename = read.readLine().substring(7).replace("%20", " ");
@@ -114,7 +111,6 @@ public class Application extends JFrame implements DropTargetListener {
                     filename = filename.substring(9);
                 }
                 read.close();
-
                 dtde.dropComplete(true);
                 System.out.println("File Dragged:" + filename);
                 //mainWindow.openFile(fileName);
@@ -127,7 +123,7 @@ public class Application extends JFrame implements DropTargetListener {
 
                 if (list.size() == 1) {
                     System.out.println("File Dragged: " + list.get(0));
-                    //mainWindow.openFile(list.get(0).toString());
+                    filename = list.get(0).getAbsolutePath(); //<-Mac was here!?
                 }
             } else {
                 System.err.println("DnD Error");
@@ -157,12 +153,11 @@ public class Application extends JFrame implements DropTargetListener {
     }
 
     private void init() {
-        //final JFrame frame = new JFrame("xwatch");
         //make sure to shut down the application, when the frame is closed
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        final Visualization applet = new Visualization();
-
+        applet = new Visualization();
+        
         applet.frame = this;
         setResizable(true);
         setLocation(100, 100);
