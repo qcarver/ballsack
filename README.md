@@ -1,6 +1,6 @@
 # ballsack
 
-![alt tag](https://raw.githubusercontent.com/qcarver/ballsack/ballsackScreenShot.jpg)
+![alt tag](ballsackScreenShot.jpg)
 
 Two ways to use ballsack:
 
