@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import processing.core.PApplet;
+import processing.event.KeyEvent;
 
 /**
  *
@@ -61,6 +62,18 @@ public class Visualization extends PApplet implements ActionListener {
             currentCircle.draw();
         }
     }
+
+    @Override
+    public void keyPressed(KeyEvent event) {
+        if (event.getKey() == '\b'){
+            if (circles != null){
+                circles.clear();
+                background(grayValue);
+            }
+        }
+    }
+    
+    
 
     public void mousePressed() {
         currentCircle = new Circle(mouseX, mouseY);
