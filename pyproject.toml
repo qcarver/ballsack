@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ballsack"
+version = "0.1.0"
+description = "BNFO-driven circle/sack visualizer with SVG output"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+	"PySide6>=6.7",
+]
+
+[project.scripts]
+ballsack = "ballsack.cli:main"
+ballsack-ui = "ballsack.ui_app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

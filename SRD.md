@@ -1,5 +1,34 @@
 # BallSack Software Requirements Document
 
+![alt tag](ballsackScreenShot.jpg)
+
+_"It\'fun."_ -People
+_"We love it!"_ -Also a Person
+
+## Use Cases
+
+### Interactive mode:
+drag out circles (balls)
+draw a circle around existing circles (sack)
+repeat!
+
+### File Manipulation
+
+Xml or Json File Visualizer:
+1. Drag and drop an xml file into the window
+2. On drop, ballsack will visualize the xml doc as balls and sacks
+
+Directory File Visuallize:
+1. Drag and drop a folder into the window
+2. On drop, ballsack will visualize the file directory as balls and sacks
+
+Design an Xml Json File:
+-  Edit or create a new collection of circles and export to a json or xml file
+
+Design a File Hierarchy:
+-  Edit or create a new collection of circles and instantiate a directory tree.
+
+
 ## 1. Purpose
 This document defines requirements for the BallSack interactive visualizer using a format-agnostic recursive payload called a BNF-Object.
 
@@ -23,8 +52,8 @@ Out of scope:
 ## 3. Product Overview
 ### 3.1 Runtime Platform
 1. Python runtime.
-2. Pygame rendering and event loop.
-3. Desktop drag/drop and keyboard/mouse control model.
+2. Basic SVG rendering output for visualization.
+3. Desktop drag/drop path handoff and file retrieval through OS events and BNFO bridge adapters.
 
 ### 3.2 Core Domain Model
 1. Circle: a visual node with center, radius, style, name, and optional children.
@@ -57,11 +86,13 @@ Out of scope:
 2. Right-drag on node shall move node or selection group.
 3. Ctrl+Right-drag shall duplicate subtree and drag the copy.
 4. Shift+Left-click shall toggle selection membership.
+5. Shift+Wheel shall pan horizontally and Wheel shall pan vertically when zoom-modifier is not active.
 
 ### FR-6 Zoom and Framing
-1. Wheel zoom shall preserve the world position under cursor.
+1. Ctrl+Wheel (or configurable zoom-modifier + Wheel) shall zoom and preserve the world position under cursor.
 2. Fit-all and smallest-visible framing actions shall be provided.
 3. Zoom transitions shall support smooth tweening.
+4. Zoom level shall be clamped between configured min/max bounds to prevent unusable views.
 
 ### FR-7 Labels
 1. Modifier-assisted label display shall render node names.
@@ -70,11 +101,21 @@ Out of scope:
 
 ### FR-8 BNF-Object Import
 1. The system shall accept recursively structured data as BNF-Object.
-2. A root BNF-Object shall map to one visual subtree.
-3. Dropping/importing on empty space shall place subtree at drop target.
-4. Dropping/importing over a host node shall attempt nested insertion.
-5. Nested insertion shall enforce containment and sibling non-overlap.
-6. On insertion failure, the system shall report status and avoid partial commit.
+2. The desktop window shall accept OS drag-and-drop directly onto the app surface.
+3. A root BNF-Object shall map to one visual subtree.
+4. Dropping/importing on empty space shall place subtree at drop target.
+5. Dropping/importing over a host node shall attempt nested insertion.
+6. Nested insertion shall enforce containment and sibling non-overlap.
+7. On insertion failure, the system shall report status and avoid partial commit.
+
+### FR-14 Desktop Window UX
+1. The window shall provide visible drop-target affordance during drag-enter and drag-over.
+2. The window shall provide an Open action for xml/json file selection.
+3. The window shall provide an Open Folder action for directory-source visualization.
+4. The window shall provide a Save SVG As action for exporting the currently rendered scene.
+5. The window shall provide a Reload action to re-import the current source path.
+6. Status messaging shall report last successful load path and failures.
+7. Import failures shall present a blocking error dialog with actionable detail.
 
 ### FR-9 Deterministic Identity
 1. Nodes shall include deterministic seed keys.

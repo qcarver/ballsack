@@ -1,34 +1,67 @@
-# ballsack
+# Ballsack Revision (BNFO + SVG)
 
-![alt tag](ballsackScreenShot.jpg)
+This revision establishes a Python baseline for Ballsack with:
 
-Two ways to use ballsack:
+- Circle packing layout ported from `portme/circlepack/ComputePositions.java`
+- BNFO-only data ingestion through `bnfo_bridges` adapter APIs
+- Basic SVG rendering (no pygame)
 
-Interactive mode:
-drag out circles (balls)
-draw a circle around existing circles (sack)
-repeat!
+## Run
 
-Xml File Visualizer:
-Drag and drop an xml file into the window
-On drop, ballsack will visualize the xml doc as balls and sacks
+Install UI dependency:
 
-Notes: You can resize the window and press backspace to clear,
-but you can't scale or position anything dragged in ...yet.
+```bash
+pip install PySide6
+```
 
-MIT license applies to all files in this project to date. Re-use enjoy.
+From this repository root:
 
-Python Port (color GUI + drag and drop):
+```bash
+PYTHONPATH=src python -m ballsack.cli --input test-drop.xml --output out/test-drop.svg
+```
 
-1. Install dependency:
-	pip install pygame
-2. Run:
-	python3 ballsack_gui.py
+In-window drag/drop viewer:
 
-Controls:
-- Drag on empty space to create circles.
-- Draw around existing circles to condense them into a sack.
-- Drag circles/sacks to move them.
-- Drop an XML file onto the window to visualize it.
-- Press Ctrl+O to pick an XML file if desktop drag-and-drop does not work.
-- Press Backspace to clear.
+```bash
+PYTHONPATH=src python -m ballsack.ui_app
+```
+
+or with script entrypoint:
+
+```bash
+ballsack-ui
+```
+
+Viewer controls:
+
+- Drop local file/folder directly into the window
+- `Ctrl+Wheel`: zoom centered on cursor
+- `Wheel`: vertical pan
+- `Shift+Wheel`: horizontal pan
+- Toolbar: Open..., Open Folder..., Reload, Save SVG As...
+
+If `bnfo_bridges` is not installed in your interpreter, this project auto-adds:
+
+- `~/Dev/BNF_Obj/src`
+
+For directory import, set:
+
+```bash
+export TREE_UI_FILE=/absolute/path/to/tree_ui.py
+```
+
+Then run:
+
+```bash
+PYTHONPATH=src python -m ballsack.cli --input /some/directory --output out/tree.svg
+```
+
+For in-window folder dropping, the same `TREE_UI_FILE` environment variable is used.
+
+## Notes
+
+- Internal structure remains BNFO-shaped dictionaries:
+  - `name: str`
+  - `fields: list[(moniker, typeName, value)]`
+  - `children: list[BNFO]`
+- Geometry layout uses the Java salvage strategy: collision-free tangent candidates sampled at 360 degrees and minimum-distance selection to weighted center.
