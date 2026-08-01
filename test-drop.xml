@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<demo>
+  <team>
+    <person>Alice</person>
+    <person>Bob</person>
+  </team>
+  <project>
+    <name>Ballsack Port</name>
+    <status>active</status>
+    <milestones>
+      <m1>drag and drop</m1>
+      <m2>xml visualization</m2>
+      <m3>interactive editing</m3>
+    </milestones>
+  </project>
+  <notes>
+    <note>short</note>
+    <note>a much longer note to produce a larger leaf circle</note>
+  </notes>
+</demo>
